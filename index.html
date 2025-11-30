@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>The World’s Most – Economics Flag Game</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      color: #222;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      padding: 20px;
+    }
+
+    h1, h2, h3 {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 15px 0 25px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      background: #2563eb;
+      color: white;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.25);
+      transition: transform 0.07s ease, box-shadow 0.07s ease, background 0.1s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.32);
+      background: #1d4ed8;
+    }
+
+    button:active {
+      transform: translateY(0px);
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+    }
+
+    .concepts {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+      margin-bottom: 18px;
+    }
+
+    .concepts h3 {
+      margin-top: 0;
+      text-align: left;
+    }
+
+    .concepts ul {
+      margin: 8px 0 0 18px;
+      padding: 0;
+    }
+
+    .concepts li {
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    #intro-screen {
+      display: block;
+    }
+
+    #game-screen {
+      display: none;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 10px;
+      min-height: 40px;
+    }
+
+    #game-area {
+      position: relative;
+      height: 360px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #e0f2fe, #fef9c3);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+
+    .flag {
+      position: absolute;
+      top: -40px;
+      font-size: 34px;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #basket {
+      position: absolute;
+      bottom: 14px;
+      width: 80px;
+      height: 40px;
+      border-radius: 999px;
+      background: #f97316;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      box-shadow: 0 3px 8px rgba(124, 45, 18, 0.4);
+    }
+
+    #options-legend {
+      margin-top: 10px;
+      font-size: 14px;
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 8px 10px;
+    }
+
+    #options-legend span {
+      margin-right: 10px;
+      white-space: nowrap;
+    }
+
+    #message {
+      margin-top: 10px;
+      min-height: 30px;
+      font-size: 14px;
+    }
+
+    .correct {
+      color: #15803d;
+    }
+
+    .wrong {
+      color: #b91c1c;
+    }
+
+    #result-screen {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: #ecfdf5;
+      border: 1px solid #22c55e;
+      display: none;
+      font-size: 14px;
+    }
+
+    #result-screen strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .gift {
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .controls-hint {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 6px;
+      color: #666;
+    }
+
+    @media (max-width: 700px) {
+      #game-area {
+        height: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>The World’s Most</h1>
+    <p class="subtitle">
+      Move the 🧺 basket left / right to collect the correct national flag before it falls!
+    </p>
+
+    <!-- INTRO / CONCEPTS SCREEN -->
+    <div id="intro-screen">
+      <div class="concepts">
+        <h3>Key Economic Concepts in This Game</h3>
+        <ul>
+          <li><strong>GDP (Gross Domestic Product)</strong>: Total value of goods and services produced in a country.</li>
+          <li><strong>GDP per capita</strong>: GDP divided by population – average income / living standard.</li>
+          <li><strong>Income inequality (Gini coefficient)</strong>: How unevenly income is distributed.</li>
+          <li><strong>Cost of living</strong>: How expensive it is to maintain a basic lifestyle.</li>
+          <li><strong>Inflation</strong>: How quickly overall prices of goods and services are rising.</li>
+          <li><strong>Unemployment rate</strong>: Share of workers who are jobless but actively looking for work.</li>
+          <li><strong>Trade surplus</strong>: Exports &gt; imports.</li>
+          <li><strong>FDI (Foreign Direct Investment)</strong>: Investment from foreign companies into a country.</li>
+          <li><strong>Minimum wage</strong>: The lowest legal wage employers can pay workers.</li>
+          <li><strong>Big Mac Index</strong>: Compares the price of a McDonald’s Big Mac in different countries to measure purchasing power.</li>
+        </ul>
+      </div>
+
+      <h3>How the Game Works</h3>
+      <p style="text-align:center; font-size:14px;">
+        Each round has <strong>6 questions</strong> and lasts <strong>3 minutes</strong>.<br/>
+        <strong>1st attempt</strong>: Set 1 questions.<br/>
+        <strong>2nd attempt</strong>: Set 2 questions.<br/>
+        Then they keep alternating.<br/><br/>
+        Get <strong>3 or more correct</strong> to win a small gift 🎁 (in real life at the booth)!
+      </p>
+
+      <div class="btn-row">
+        <button id="start-game">Start Game</button>
+      </div>
+
+      <p class="controls-hint">
+        Controls: Use <strong>←</strong> and <strong>→</strong> arrow keys (or A / D) to move the basket.
+      </p>
+    </div>
+
+    <!-- GAME SCREEN -->
+    <div id="game-screen">
+      <div class="hud">
+        <div id="question-counter">Question 1 / 6</div>
+        <div id="timer">Time left: 03:00</div>
+        <div id="score-display">Correct: 0</div>
+      </div>
+      <div class="question-text" id="question-text"></div>
+
+      <div id="game-area">
+        <div id="basket">🧺</div>
+      </div>
+
+      <div id="options-legend"></div>
+      <div id="message"></div>
+
+      <div id="result-screen">
+        <strong id="result-title"></strong>
+        <span id="result-detail"></span>
+        <div class="gift" id="gift-message"></div>
+        <div class="btn-row" style="margin-top:10px; justify-content:flex-start;">
+          <button id="play-again">Play Again (Next Set)</button>
+          <button id="back-to-intro">Back to Concepts</button>
+        </div>
+      </div>
+
+      <p class="controls-hint">
+        Remember: collect the <strong>correct flag</strong> before it disappears. One catch = one answer!
+      </p>
+    </div>
+  </div>
+
+  <script>
+    // ---------- QUESTION DATA ----------
+
+    const SET1_QUESTIONS = [
+      {
+        id: 1,
+        text: "Which country has the highest GDP in the world?",
+        options: [
+          { country: "China", flag: "🇨🇳" },
+          { country: "Japan", flag: "🇯🇵" },
+          { country: "Germany", flag: "🇩🇪" },
+          { country: "United States", flag: "🇺🇸" } // correct
+        ],
+        correctIndex: 3,
+        explanation: "The United States has the world’s largest economy in terms of nominal GDP."
+      },
+      {
+        id: 3,
+        text: "Which country is known for having the highest level of income inequality?",
+        options: [
+          { country: "Brazil", flag: "🇧🇷" },
+          { country: "South Africa", flag: "🇿🇦" }, // correct
+          { country: "Canada", flag: "🇨🇦" },
+          { country: "India", flag: "🇮🇳" }
+        ],
+        correctIndex: 1,
+        explanation: "South Africa’s Gini coefficient is among the highest, showing very unequal income distribution."
+      },
+      {
+        id: 5,
+        text: "Which country has the highest national debt as a percentage of GDP?",
+        options: [
+          { country: "United States", flag: "🇺🇸" },
+          { country: "Greece", flag: "🇬🇷" },
+          { country: "Japan", flag: "🇯🇵" }, // correct
+          { country: "Italy", flag: "🇮🇹" }
+        ],
+        correctIndex: 2,
+        explanation: "Japan’s public debt is more than twice its GDP, one of the highest ratios in the world."
+      },
+      {
+        id: 7,
+        text: "Which country has experienced one of the highest inflation rates in recent years?",
+        options: [
+          { country: "Zimbabwe", flag: "🇿🇼" },
+          { country: "Venezuela", flag: "🇻🇪" }, // correct
+          { country: "Argentina", flag: "🇦🇷" },
+          { country: "Turkey", flag: "🇹🇷" }
+        ],
+        correctIndex: 1,
+        explanation: "Venezuela has suffered from hyperinflation due to severe economic and political instability."
+      },
+      {
+        id: 9,
+        text: "Which country is known for having a very high youth unemployment rate?",
+        options: [
+          { country: "Spain", flag: "🇪🇸" },
+          { country: "Italy", flag: "🇮🇹" },
+          { country: "France", flag: "🇫🇷" },
+          { country: "Greece", flag: "🇬🇷" } // correct
+        ],
+        correctIndex: 3,
+        explanation: "Greece has had very high unemployment, especially among young people aged 15–24."
+      },
+      {
+        id: 11,
+        text: "According to the Big Mac Index, which country often has one of the highest Big Mac prices?",
+        options: [
+          { country: "Switzerland", flag: "🇨🇭" }, // correct
+          { country: "India", flag: "🇮🇳" },
+          { country: "China", flag: "🇨🇳" },
+          { country: "South Africa", flag: "🇿🇦" }
+        ],
+        correctIndex: 0,
+        explanation: "Switzerland usually has one of the most expensive Big Macs, showing a strong currency and high price level."
+      }
+    ];
+
+    const SET2_QUESTIONS = [
+      {
+        id: 2,
+        text: "Which country has the highest GDP per capita?",
+        options: [
+          { country: "Norway", flag: "🇳🇴" },
+          { country: "Luxembourg", flag: "🇱🇺" }, // correct
+          { country: "Switzerland", flag: "🇨🇭" },
+          { country: "Singapore", flag: "🇸🇬" }
+        ],
+        correctIndex: 1,
+        explanation: "Luxembourg’s small population and strong financial sector give it very high GDP per person."
+      },
+      {
+        id: 4,
+        text: "Which country is famous for having one of the highest costs of living?",
+        options: [
+          { country: "Japan", flag: "🇯🇵" },
+          { country: "Australia", flag: "🇦🇺" },
+          { country: "Switzerland", flag: "🇨🇭" }, // correct
+          { country: "United States", flag: "🇺🇸" }
+        ],
+        correctIndex: 2,
+        explanation: "Switzerland has very high prices for housing, food and services, making it one of the most expensive places to live."
+      },
+      {
+        id: 6,
+        text: "Which country has one of the lowest unemployment rates?",
+        options: [
+          { country: "Qatar", flag: "🇶🇦" }, // correct
+          { country: "Germany", flag: "🇩🇪" },
+          { country: "Canada", flag: "🇨🇦" },
+          { country: "Switzerland", flag: "🇨🇭" }
+        ],
+        correctIndex: 0,
+        explanation: "Qatar’s labour market structure leads to extremely low measured unemployment."
+      },
+      {
+        id: 8,
+        text: "Which country has one of the largest trade surpluses?",
+        options: [
+          { country: "China", flag: "🇨🇳" }, // correct
+          { country: "Japan", flag: "🇯🇵" },
+          { country: "Germany", flag: "🇩🇪" },
+          { country: "United States", flag: "🇺🇸" }
+        ],
+        correctIndex: 0,
+        explanation: "China exports far more than it imports, producing a very large trade surplus."
+      },
+      {
+        id: 13,
+        text: "Which country has the highest number of billionaires?",
+        options: [
+          { country: "India", flag: "🇮🇳" },
+          { country: "United States", flag: "🇺🇸" }, // correct
+          { country: "Russia", flag: "🇷🇺" },
+          { country: "Germany", flag: "🇩🇪" }
+        ],
+        correctIndex: 1,
+        explanation: "The United States leads the world in number of billionaires, driven by tech, finance and other industries."
+      },
+      {
+        id: 16,
+        text: "Which country among the following has one of the lowest minimum wages (in HKD terms)?",
+        options: [
+          { country: "United States", flag: "🇺🇸" },
+          { country: "United Kingdom", flag: "🇬🇧" },
+          { country: "Philippines", flag: "🇵🇭" }, // correct (relative to others listed)
+          { country: "Australia", flag: "🇦🇺" }
+        ],
+        correctIndex: 2,
+        explanation: "The Philippines has a much lower statutory minimum wage than the other countries listed, when converted into HKD."
+      }
+    ];
+
+    // ---------- GAME STATE ----------
+
+    const introScreen = document.getElementById("intro-screen");
+    const gameScreen = document.getElementById("game-screen");
+    const questionTextEl = document.getElementById("question-text");
+    const questionCounterEl = document.getElementById("question-counter");
+    const timerEl = document.getElementById("timer");
+    const scoreDisplayEl = document.getElementById("score-display");
+    const gameArea = document.getElementById("game-area");
+    const basket = document.getElementById("basket");
+    const optionsLegendEl = document.getElementById("options-legend");
+    const messageEl = document.getElementById("message");
+    const resultScreen = document.getElementById("result-screen");
+    const resultTitleEl = document.getElementById("result-title");
+    const resultDetailEl = document.getElementById("result-detail");
+    const giftMessageEl = document.getElementById("gift-message");
+
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let timeLeft = 180; // seconds
+    let timerInterval = null;
+    let animationInterval = null;
+    let fallingFlags = [];
+    let questionActive = false;
+    let basketX = 0;
+
+    let audioCtx = null;
+    let bgMusicInterval = null;
+    let attemptCount = 0;
+
+    function resetGameState() {
+      clearInterval(timerInterval);
+      clearInterval(animationInterval);
+      timerInterval = null;
+      animationInterval = null;
+      timeLeft = 180;
+      currentIndex = 0;
+      score = 0;
+      fallingFlags = [];
+      questionActive = false;
+      messageEl.textContent = "";
+      optionsLegendEl.textContent = "";
+      resultScreen.style.display = "none";
+      updateTimerDisplay();
+      updateScoreDisplay();
+    }
+
+    function startGameAuto() {
+      attemptCount++;
+      const setNumber = attemptCount % 2 === 1 ? 1 : 2; // 1st,3rd,5th... -> Set 1; 2nd,4th... -> Set 2
+      startGame(setNumber);
+    }
+
+    function startGame(setNumber) {
+      resetGameState();
+      currentQuestions = setNumber === 1 ? SET1_QUESTIONS : SET2_QUESTIONS;
+
+      introScreen.style.display = "none";
+      gameScreen.style.display = "block";
+
+      // Place basket in the center
+      setTimeout(() => {
+        const areaWidth = gameArea.clientWidth;
+        basketX = (areaWidth - basket.offsetWidth) / 2;
+        updateBasketPosition();
+      }, 0);
+
+      startTimer();
+      startBackgroundMusic();
+      loadQuestion();
+    }
+
+    function startTimer() {
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft < 0) timeLeft = 0;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
+      const seconds = String(timeLeft % 60).padStart(2, "0");
+      timerEl.textContent = `Time left: ${minutes}:${seconds}`;
+    }
+
+    function updateScoreDisplay() {
+      scoreDisplayEl.textContent = `Correct: ${score}`;
+    }
+
+    function loadQuestion() {
+      clearInterval(animationInterval);
+      animationInterval = null;
+      // Remove old flags
+      fallingFlags.forEach(f => {
+        if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
+      });
+      fallingFlags = [];
+      messageEl.textContent = "";
+      optionsLegendEl.textContent = "";
+
+      if (currentIndex >= currentQuestions.length || timeLeft <= 0) {
+        endGame();
+        return;
+      }
+
+      const q = currentQuestions[currentIndex];
+      questionActive = true;
+
+      questionCounterEl.textContent = `Question ${currentIndex + 1} / ${currentQuestions.length}`;
+      questionTextEl.textContent = q.text;
+
+      // Show options legend (flag + country name)
+      q.options.forEach(opt => {
+        const span = document.createElement("span");
+        span.textContent = `${opt.flag} ${opt.country}`;
+        optionsLegendEl.appendChild(span);
+      });
+
+      // Create falling flags
+      const areaWidth = gameArea.clientWidth;
+      const areaHeight = gameArea.clientHeight;
+
+      q.options.forEach((opt, index) => {
+        const el = document.createElement("div");
+        el.className = "flag";
+        el.textContent = opt.flag;
+        gameArea.appendChild(el);
+
+        const flagWidth = 34; // approx
+        const x = Math.random() * (areaWidth - flagWidth - 20) + 10;
+        const speed = 1.5 + Math.random() * 1.5;
+
+        el.style.left = x + "px";
+        el.style.top = "-40px";
+
+        fallingFlags.push({
+          el,
+          x,
+          y: -40,
+          speed,
+          isCorrect: index === q.correctIndex,
+          option: opt
+        });
+      });
+
+      // Start animation
+      animationInterval = setInterval(() => {
+        updateFlags(areaHeight);
+      }, 30);
+    }
+
+    function updateFlags(areaHeight) {
+      if (!questionActive) return;
+
+      const basketRect = basket.getBoundingClientRect();
+
+      fallingFlags.forEach(flag => {
+        flag.y += flag.speed;
+        flag.el.style.top = flag.y + "px";
+
+        // Collision detection
+        const flagRect = flag.el.getBoundingClientRect();
+        if (isIntersecting(basketRect, flagRect) && questionActive) {
+          handleFlagCaught(flag);
+        }
+      });
+
+      // Remove flags that fall out of area
+      fallingFlags = fallingFlags.filter(flag => {
+        if (flag.y > areaHeight) {
+          if (flag.el && flag.el.parentNode) {
+            flag.el.parentNode.removeChild(flag.el);
+          }
+          return false;
+        }
+        return true;
+      });
+
+      // If all flags are gone and question still active -> move on (treated as incorrect)
+      if (fallingFlags.length === 0 && questionActive) {
+        questionActive = false;
+        messageEl.textContent = "Time’s up for this question! The flags disappeared.";
+        messageEl.className = "wrong";
+        setTimeout(() => {
+          currentIndex++;
+          loadQuestion();
+        }, 1200);
+      }
+    }
+
+    function isIntersecting(rect1, rect2) {
+      return !(
+        rect1.right < rect2.left ||
+        rect1.left > rect2.right ||
+        rect1.bottom < rect2.top ||
+        rect1.top > rect2.bottom
+      );
+    }
+
+    function handleFlagCaught(flag) {
+      questionActive = false;
+      playBeep();
+
+      // Stop animation for this question
+      clearInterval(animationInterval);
+      animationInterval = null;
+
+      // Clean up other flags after a short delay
+      setTimeout(() => {
+        fallingFlags.forEach(f => {
+          if (f.el && f.el.parentNode) f.el.parentNode.removeChild(f.el);
+        });
+        fallingFlags = [];
+      }, 200);
+
+      const q = currentQuestions[currentIndex];
+      const correctOption = q.options[q.correctIndex];
+
+      if (flag.isCorrect) {
+        score++;
+        updateScoreDisplay();
+        messageEl.textContent = "✅ Correct! " + q.explanation;
+        messageEl.className = "correct";
+      } else {
+        messageEl.textContent = `❌ Not quite. The correct flag was ${correctOption.flag} ${correctOption.country}. ${q.explanation}`;
+        messageEl.className = "wrong";
+      }
+
+      setTimeout(() => {
+        currentIndex++;
+        loadQuestion();
+      }, 1700);
+    }
+
+    function endGame() {
+      questionActive = false;
+      clearInterval(animationInterval);
+      animationInterval = null;
+      stopBackgroundMusic();
+
+      resultScreen.style.display = "block";
+      resultTitleEl.textContent = "Game Over!";
+      resultDetailEl.textContent = `You answered ${score} out of ${currentQuestions.length} questions correctly.`;
+
+      if (score >= 3) {
+        giftMessageEl.textContent = "🎁 You win a small gift! (Please collect it from the booth teacher.)";
+        playWinSound();
+        setTimeout(() => {
+          alert("🎉 Congratulations! You won the game and earned a small gift! Please show this screen to the teacher.");
+        }, 200);
+      } else {
+        giftMessageEl.textContent = "Keep trying! Get 3 or more correct next time to win a gift.";
+      }
+    }
+
+    // ---------- BASKET MOVEMENT ----------
+
+    function updateBasketPosition() {
+      const areaWidth = gameArea.clientWidth;
+      const maxX = areaWidth - basket.offsetWidth - 4;
+      if (basketX < 4) basketX = 4;
+      if (basketX > maxX) basketX = maxX;
+      basket.style.left = basketX + "px";
+    }
+
+    window.addEventListener("keydown", (e) => {
+      const step = 24;
+      if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+        basketX -= step;
+        updateBasketPosition();
+      } else if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+        basketX += step;
+        updateBasketPosition();
+      }
+    });
+
+    // ---------- SOUND EFFECTS & MUSIC ----------
+
+    function ensureAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        audioCtx = new AudioContext();
+      }
+    }
+
+    function playBeep() {
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
+
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.type = "square";
+        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.start();
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+        osc.stop(audioCtx.currentTime + 0.15);
+      } catch (e) {
+        // ignore audio errors
+      }
+    }
+
+    function playWinSound() {
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
+
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(600, now);
+        osc.frequency.linearRampToValueAtTime(900, now + 0.3);
+
+        gainNode.gain.setValueAtTime(0.25, now);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.4);
+      } catch (e) {
+        // ignore audio errors
+      }
+    }
+
+    function startBackgroundMusic() {
+      try {
+        ensureAudioContext();
+        if (!audioCtx) return;
+
+        stopBackgroundMusic(); // clear any previous loop
+
+        const notes = [261.63, 329.63, 392.00, 523.25]; // C, E, G, C
+
+        bgMusicInterval = setInterval(() => {
+          const osc = audioCtx.createOscillator();
+          const gainNode = audioCtx.createGain();
+
+          osc.type = "sine";
+          const freq = notes[Math.floor(Math.random() * notes.length)];
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+          gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+
+          osc.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+
+          osc.start();
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+          osc.stop(audioCtx.currentTime + 0.4);
+        }, 600);
+      } catch (e) {
+        // ignore audio errors
+      }
+    }
+
+    function stopBackgroundMusic() {
+      if (bgMusicInterval) {
+        clearInterval(bgMusicInterval);
+        bgMusicInterval = null;
+      }
+    }
+
+    // ---------- BUTTON HOOKUP ----------
+
+    document.getElementById("start-game").addEventListener("click", startGameAuto);
+    document.getElementById("play-again").addEventListener("click", startGameAuto);
+
+    document.getElementById("back-to-intro").addEventListener("click", () => {
+      clearInterval(timerInterval);
+      clearInterval(animationInterval);
+      stopBackgroundMusic();
+      introScreen.style.display = "block";
+      gameScreen.style.display = "none";
+    });
+  </script>
+</body>
+</html>
